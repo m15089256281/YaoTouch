@@ -13,6 +13,7 @@ public class YaoTouchApp extends Application {
     public void onCreate() {
         super.onCreate();
         application = this;
+        ConfigurationUtil.readConfiguration();
     }
 
     public static YaoTouchApp getApplication() {

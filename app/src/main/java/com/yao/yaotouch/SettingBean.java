@@ -5,14 +5,14 @@ package com.yao.yaotouch;
  */
 public class SettingBean {
 
-    String key;
+    Action key;
     Action value;
 
-    public String getKey() {
+    public Action getKey() {
         return key;
     }
 
-    public void setKey(String key) {
+    public void setKey(Action key) {
         this.key = key;
     }
 

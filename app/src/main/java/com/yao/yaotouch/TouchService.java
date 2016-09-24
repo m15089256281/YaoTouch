@@ -16,7 +16,6 @@ import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.accessibility.AccessibilityEvent;
-import android.widget.Button;
 import android.widget.LinearLayout;
 
 public class TouchService extends AccessibilityService implements OnClickListener, View.OnLongClickListener, OnTouchListener {
@@ -155,7 +154,7 @@ public class TouchService extends AccessibilityService implements OnClickListene
     @Override
     public boolean onLongClick(View view) {
         execute(onLongClick);
-        return false;
+        return true;
     }
 
     /**

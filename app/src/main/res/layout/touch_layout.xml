@@ -5,8 +5,8 @@
 
     <View
         android:id="@+id/button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="49dp"
+        android:layout_height="49dp"
         android:background="@drawable/round_white" />
 
 </LinearLayout>

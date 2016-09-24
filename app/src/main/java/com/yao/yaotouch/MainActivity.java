@@ -37,14 +37,13 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(adapter);
 
-        for (Action action : responseActions) {
-            SettingBean bean = new SettingBean();
-            bean.setKey(action.getName());
-            settingList.add(bean);
+        if (settingList.size() == 0) {
+            for (Action action : responseActions) {
+                SettingBean bean = new SettingBean();
+                bean.setKey(action);
+                settingList.add(bean);
+            }
         }
-        PermissionUtil.verifyStoragePermissions(this);
-        ConfigurationUtil.readConfiguration();
-        adapter.notifyDataSetChanged();
     }
 
     private void readKeys() {
