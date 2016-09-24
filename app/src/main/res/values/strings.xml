@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">YaoTouch</string>
+    <string name="accessibility_service_label">YaoTouch</string>
+    <string name="accessibility_service_description">为保证YaoTouch能正常运行，请开启这项服务</string>
+</resources>
