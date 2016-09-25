@@ -67,7 +67,6 @@ public class ConfigurationUtil {
         if (bean.getValue() == null) return;
         int action = bean.getKey().getAction();
         if (action == 0) {
-            Utils.showLog("-----------");
             TouchService.onClick = bean.getValue().getAction();
         } else if (action == 1) {
             TouchService.onDoubleClick = bean.getValue().getAction();
