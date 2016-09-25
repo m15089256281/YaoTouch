@@ -2,10 +2,12 @@ package com.yao.yaotouch;
 
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,6 +22,9 @@ import android.widget.LinearLayout;
 
 public class TouchService extends AccessibilityService implements OnClickListener, View.OnLongClickListener, OnTouchListener {
 
+    //震动
+    private Vibrator vibrator;
+
     //定义浮动窗口布局
     LinearLayout mFloatLayout;
     LayoutParams wmParams;
@@ -28,6 +33,11 @@ public class TouchService extends AccessibilityService implements OnClickListene
 
 //    //悬浮球
 //    View mFloatView;
+
+    private long startTime = 0;
+    private long endTime = 0;
+
+    private boolean isclick;
 
     private float mTouchStartX;
     private float mTouchStartY;
@@ -47,12 +57,15 @@ public class TouchService extends AccessibilityService implements OnClickListene
     private void execute(int incident) {
         switch (incident) {
             case INCIDENT_BACK:
+                vibrate();
                 this.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
                 break;
             case INCIDENT_HOME:
+                vibrate();
                 this.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
                 break;
             case INCIDENT_TASK:
+                vibrate();
                 this.performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS);
                 break;
         }
@@ -100,7 +113,7 @@ public class TouchService extends AccessibilityService implements OnClickListene
         mFloatLayout.setOnTouchListener(this);
         //设置监听悬浮球点击
         mFloatLayout.setOnClickListener(this);
-        //设置监听悬浮球点击
+        //设置监听悬浮球长按
         mFloatLayout.setOnLongClickListener(this);
     }
 
@@ -175,17 +188,32 @@ public class TouchService extends AccessibilityService implements OnClickListene
                 //获取相对View的坐标，即以此View左上角为原点
                 mTouchStartX = event.getX();
                 mTouchStartY = event.getY();
-                Log.i("startP", "startX" + mTouchStartX + "====startY" + mTouchStartY);
+
+                //当按下的时候设置isclick为false，具体原因看后边的讲解
+                isclick = false;
+                startTime = System.currentTimeMillis();
+
                 break;
             case MotionEvent.ACTION_MOVE:   //捕获手指触摸移动动作
                 updateViewPosition();
+                isclick = true;
                 break;
             case MotionEvent.ACTION_UP:    //捕获手指触摸离开动作
+
+                endTime = System.currentTimeMillis();
+                //当从点击到弹起小于半秒的时候,则判断为点击,如果超过则不响应点击事件
+                if ((endTime - startTime) > 100) {
+                    isclick = true;
+                } else {
+                    isclick = false;
+                }
                 updateViewPosition();
                 mTouchStartX = mTouchStartY = 0;
+
                 break;
         }
-        return false;
+        Utils.showLog(isclick+"");
+        return isclick;
     }
 
     /**
@@ -197,4 +225,12 @@ public class TouchService extends AccessibilityService implements OnClickListene
         mWindowManager.updateViewLayout(mFloatLayout, wmParams);  //刷新显示
     }
 
+    private void vibrate() {
+         /*
+         * 想设置震动大小可以通过改变pattern来设定，如果开启时间太短，震动效果可能感觉不到
+         * */
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        long[] pattern = {0, 50};   // 停止 开启
+        vibrator.vibrate(pattern, -1);           //重复两次上面的pattern 如果只想震动一次，index设为-1
+    }
 }
