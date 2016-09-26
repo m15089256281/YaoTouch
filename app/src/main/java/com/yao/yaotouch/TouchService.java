@@ -39,7 +39,7 @@ public class TouchService extends AccessibilityService implements OnClickListene
     //触摸/点击控制
     private boolean isClick;
     //触摸/长按控制
-    private boolean isLongClick;
+//    private boolean isLongClick;
 
 
     private float mTouchStartX;
@@ -169,7 +169,7 @@ public class TouchService extends AccessibilityService implements OnClickListene
 
     @Override
     public boolean onLongClick(View view) {
-        if (!isLongClick)
+//        if (!isLongClick)
             execute(onLongClick);
         return true;
     }
@@ -196,14 +196,14 @@ public class TouchService extends AccessibilityService implements OnClickListene
                 //当按下的时候设置isclick为false，具体原因看后边的讲解
                 isClick = false;
                 startTime = System.currentTimeMillis();
-                isLongClick = false;
+//                isLongClick = false;
                 break;
             case MotionEvent.ACTION_MOVE:   //捕获手指触摸移动动作
                 updateViewPosition();
-                isLongClick = true;
+//                isLongClick = true;
                 break;
             case MotionEvent.ACTION_UP:    //捕获手指触摸离开动作
-                isLongClick = false;
+//                isLongClick = false;
                 endTime = System.currentTimeMillis();
                 //当从点击到弹起小于半秒的时候,则判断为点击,如果超过则不响应点击事件
                 if ((endTime - startTime) > 100) {
