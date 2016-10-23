@@ -1,5 +1,6 @@
 package com.yao.yaotouch;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import org.json.JSONArray;
@@ -73,5 +74,15 @@ public class ConfigurationUtil {
         } else if (action == 2) {
             TouchService.onLongClick = bean.getValue().getAction();
         }
+    }
+
+    public static int Dp2Px(Context context, float dp) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5f);
+    }
+
+    public static int Px2Dp(Context context, float px) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (px / scale + 0.5f);
     }
 }

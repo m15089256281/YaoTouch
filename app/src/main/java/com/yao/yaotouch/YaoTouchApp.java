@@ -14,6 +14,7 @@ public class YaoTouchApp extends Application {
         super.onCreate();
         application = this;
         ConfigurationUtil.readConfiguration();
+        TouchService.size = getSharedPreferences("Configuration", MODE_PRIVATE).getInt("size", 49);
     }
 
     public static YaoTouchApp getApplication() {

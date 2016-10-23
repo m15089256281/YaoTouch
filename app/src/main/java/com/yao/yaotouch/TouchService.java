@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.accessibility.AccessibilityEvent;
@@ -31,8 +32,8 @@ public class TouchService extends AccessibilityService implements OnClickListene
     //创建浮动窗口设置布局参数的对象
     WindowManager mWindowManager;
 
-//    //悬浮球
-//    View mFloatView;
+    //悬浮球
+    View mFloatView;
 
     private long startTime = 0;
     private long endTime = 0;
@@ -47,14 +48,18 @@ public class TouchService extends AccessibilityService implements OnClickListene
     private float x;
     private float y;
 
+    //配置
     public static int onClick = -1;
     public static int onDoubleClick = -1;
     public static int onLongClick = -1;
+    public static int size = 49;
 
     private static final String TAG = "TouchService";
     private static final int INCIDENT_BACK = 0;
     private static final int INCIDENT_HOME = 1;
     private static final int INCIDENT_TASK = 2;
+
+    private static TouchService mTouchService;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void execute(int incident) {
@@ -97,8 +102,8 @@ public class TouchService extends AccessibilityService implements OnClickListene
         mFloatLayout = (LinearLayout) inflater.inflate(R.layout.touch_layout, null);
         //添加mFloatLayout
         mWindowManager.addView(mFloatLayout, wmParams);
-//        //浮动窗口按钮
-//        mFloatView = mFloatLayout.findViewById(R.id.button);
+        //浮动窗口按钮
+        mFloatView = mFloatLayout.findViewById(R.id.button);
 
         mFloatLayout.measure(View.MeasureSpec.makeMeasureSpec(0,
                 View.MeasureSpec.UNSPECIFIED), View.MeasureSpec
@@ -118,12 +123,16 @@ public class TouchService extends AccessibilityService implements OnClickListene
         mFloatLayout.setOnClickListener(this);
         //设置监听悬浮球长按
         mFloatLayout.setOnLongClickListener(this);
+//        mFloatLayout.getChildAt(0).startAnimation(AnimationUtil.getRotateAction(0f, 360f, -1, 150));
+//        mFloatLayout.getChildAt(0).startAnimation(AnimationUtil.getScaleAction(0.5f, 1f, -1, 1000));
+        refreshSize();
     }
 
 
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
+        mTouchService = this;
         createFloatView();
     }
 
@@ -170,7 +179,7 @@ public class TouchService extends AccessibilityService implements OnClickListene
     @Override
     public boolean onLongClick(View view) {
 //        if (!isLongClick)
-            execute(onLongClick);
+        execute(onLongClick);
         return true;
     }
 
@@ -235,5 +244,13 @@ public class TouchService extends AccessibilityService implements OnClickListene
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         long[] pattern = {0, 50};   // 停止 开启
         vibrator.vibrate(pattern, -1);           //重复两次上面的pattern 如果只想震动一次，index设为-1
+    }
+
+    public static void refreshSize() {
+        if (mTouchService == null || mTouchService.mFloatView == null) return;
+        ViewGroup.LayoutParams lp = mTouchService.mFloatView.getLayoutParams();
+        lp.width = ConfigurationUtil.Dp2Px(YaoTouchApp.getApplication(), size);
+        lp.height = ConfigurationUtil.Dp2Px(YaoTouchApp.getApplication(), size);
+        mTouchService.mFloatView.requestLayout();
     }
 }
