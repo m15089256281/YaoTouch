@@ -8,7 +8,6 @@ import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.SystemClock;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -38,13 +37,11 @@ public class TouchService extends AccessibilityService implements OnClickListene
     //悬浮球
     View mFloatView;
 
+    //长按响应开关
+    boolean isLongClick = true;
+
     private long startTime = 0;
     private long endTime = 0;
-    //触摸/点击控制
-    private boolean isClick;
-    //触摸/长按控制
-//    private boolean isLongClick;
-
 
     private float mTouchStartX;
     private float mTouchStartY;
@@ -179,15 +176,12 @@ public class TouchService extends AccessibilityService implements OnClickListene
         if (node.getChildCount() == 0) {
             if (node.getText() != null) {
                 if ("再来一次".equals(node.getText().toString())) {
-                    Log.i("Yao", "---------------再来一次");
                     node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     return node;
                 } else if ("本次扫描没有结果".equals(node.getText().toString())) {
-                    Log.i("Yao", "---------------本次扫描没有结果");
                     node.getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     return node;
                 } else if ("收下福卡".equals(node.getText().toString())) {
-                    Log.i("Yao", "---------------收下福卡");
                     node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
 
                     return node;
@@ -232,9 +226,10 @@ public class TouchService extends AccessibilityService implements OnClickListene
 
     @Override
     public boolean onLongClick(View view) {
-//        if (!isLongClick)
-        execute(onLongClick);
-        return true;
+        if (isLongClick) {
+            execute(onLongClick);
+        }
+        return false;
     }
 
     /**
@@ -249,37 +244,34 @@ public class TouchService extends AccessibilityService implements OnClickListene
         //获取相对屏幕的坐标，即以屏幕左上角为原点
         x = event.getRawX();
         y = event.getRawY();
-        Log.i("currP", "currX" + x + "====currY" + y);
-        switch (event.getAction()) {
+        switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:    //捕获手指触摸按下动作
                 //获取相对View的坐标，即以此View左上角为原点
                 mTouchStartX = event.getX();
                 mTouchStartY = event.getY();
 
-                //当按下的时候设置isclick为false，具体原因看后边的讲解
-                isClick = false;
                 startTime = System.currentTimeMillis();
-//                isLongClick = false;
-                break;
+                isLongClick = true;
+                return false;
             case MotionEvent.ACTION_MOVE:   //捕获手指触摸移动动作
                 updateViewPosition();
-//                isLongClick = true;
-                break;
+                //移动距离大于10,不响应长按事件
+                if (Math.abs(event.getX() - mTouchStartX) + Math.abs(event.getY() - mTouchStartY) > 10)
+                    isLongClick = false;
+                return true;
             case MotionEvent.ACTION_UP:    //捕获手指触摸离开动作
-//                isLongClick = false;
                 endTime = System.currentTimeMillis();
-                //当从点击到弹起小于半秒的时候,则判断为点击,如果超过则不响应点击事件
-                if ((endTime - startTime) > 100) {
-                    isClick = true;
-                } else {
-                    isClick = false;
-                }
                 updateViewPosition();
                 mTouchStartX = mTouchStartY = 0;
-
-                break;
+//                isLongClick = true;
+                //当从点击到弹起小于半秒的时候,则判断为点击,如果超过则不响应点击事件
+                if ((endTime - startTime) > 100) {
+                    return true;
+                } else {
+                    return false;
+                }
         }
-        return isClick;
+        return true;
     }
 
     /**
@@ -300,6 +292,9 @@ public class TouchService extends AccessibilityService implements OnClickListene
         vibrator.vibrate(pattern, -1);           //重复两次上面的pattern 如果只想震动一次，index设为-1
     }
 
+    /**
+     * 刷新悬浮按钮大小
+     */
     public static void refreshSize() {
         if (mTouchService == null || mTouchService.mFloatView == null) return;
         ViewGroup.LayoutParams lp = mTouchService.mFloatView.getLayoutParams();
