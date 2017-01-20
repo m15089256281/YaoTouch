@@ -1,4 +1,4 @@
-package com.yao.yaotouch;
+package com.yao.yaotouch.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,9 +6,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.yao.yaotouch.R;
+import com.yao.yaotouch.bean.SettingBean;
+import com.yao.yaotouch.bean.Action;
+import com.yao.yaotouch.ui.ActionDialog;
+import com.yao.yaotouch.utils.ConfigurationUtil;
+
 import java.util.List;
 
-import static com.yao.yaotouch.ConfigurationUtil.sponsorActions;
+import static com.yao.yaotouch.utils.ConfigurationUtil.sponsorActions;
 
 /**
  * Created by Yao on 2016/9/21 0021.

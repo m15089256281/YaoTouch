@@ -1,4 +1,4 @@
-package com.yao.yaotouch;
+package com.yao.yaotouch.ui;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -11,6 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+
+import com.yao.yaotouch.bean.Action;
+import com.yao.yaotouch.R;
+import com.yao.yaotouch.bean.SettingBean;
+import com.yao.yaotouch.adapter.ActionAdapter;
 
 import java.util.List;
 

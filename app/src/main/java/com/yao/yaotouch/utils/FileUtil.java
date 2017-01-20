@@ -1,4 +1,6 @@
-package com.yao.yaotouch;
+package com.yao.yaotouch.utils;
+
+import com.yao.yaotouch.YaoTouchApp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

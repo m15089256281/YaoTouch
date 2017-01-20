@@ -1,4 +1,4 @@
-package com.yao.yaotouch;
+package com.yao.yaotouch.bean;
 
 /**
  * Created by Yao on 2016/9/21 0021.

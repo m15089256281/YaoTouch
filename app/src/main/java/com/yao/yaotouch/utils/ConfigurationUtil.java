@@ -1,7 +1,11 @@
-package com.yao.yaotouch;
+package com.yao.yaotouch.utils;
 
 import android.content.Context;
 import android.text.TextUtils;
+
+import com.yao.yaotouch.bean.SettingBean;
+import com.yao.yaotouch.TouchService;
+import com.yao.yaotouch.bean.Action;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package com.yao.yaotouch;
+package com.yao.yaotouch.ui;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,16 +6,25 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
+
+import com.yao.yaotouch.bean.Action;
+import com.yao.yaotouch.R;
+import com.yao.yaotouch.adapter.SettingAdapter;
+import com.yao.yaotouch.bean.SettingBean;
+import com.yao.yaotouch.TouchService;
+import com.yao.yaotouch.YaoTouchApp;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import static com.yao.yaotouch.ConfigurationUtil.responseActions;
-import static com.yao.yaotouch.ConfigurationUtil.settingList;
-import static com.yao.yaotouch.ConfigurationUtil.sponsorActions;
+import static com.yao.yaotouch.utils.ConfigurationUtil.responseActions;
+import static com.yao.yaotouch.utils.ConfigurationUtil.settingList;
+import static com.yao.yaotouch.utils.ConfigurationUtil.sponsorActions;
 
 
 public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener {
@@ -25,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     SettingAdapter adapter;
     SeekBar seekBar;
     TextView sizeTv;
-
+    Switch isScanSw;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +56,14 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         seekBar.setOnSeekBarChangeListener(this);
         sizeTv = (TextView) findViewById(R.id.tv_size);
         sizeTv.setText(TouchService.size + "");
+
+        isScanSw = (Switch) findViewById(R.id.is_scan);
+        isScanSw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                TouchService.isScan = isChecked;
+            }
+        });
 
         if (settingList.size() == 0) {
             for (Action action : responseActions) {

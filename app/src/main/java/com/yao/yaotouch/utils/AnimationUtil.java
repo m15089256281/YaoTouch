@@ -1,4 +1,4 @@
-package com.yao.yaotouch;
+package com.yao.yaotouch.utils;
 
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;

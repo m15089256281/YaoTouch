@@ -2,6 +2,8 @@ package com.yao.yaotouch;
 
 import android.app.Application;
 
+import com.yao.yaotouch.utils.ConfigurationUtil;
+
 /**
  * Created by Yao on 2016/9/21 0021.
  */

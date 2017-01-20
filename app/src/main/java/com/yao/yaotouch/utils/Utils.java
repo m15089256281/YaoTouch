@@ -1,7 +1,9 @@
-package com.yao.yaotouch;
+package com.yao.yaotouch.utils;
 
 import android.util.Log;
 import android.widget.Toast;
+
+import com.yao.yaotouch.YaoTouchApp;
 
 /**
  * Created by Yao on 2016/9/24 0024.

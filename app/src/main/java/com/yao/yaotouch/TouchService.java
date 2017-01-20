@@ -19,7 +19,10 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.LinearLayout;
+
+import com.yao.yaotouch.utils.ConfigurationUtil;
 
 public class TouchService extends AccessibilityService implements OnClickListener, View.OnLongClickListener, OnTouchListener {
 
@@ -53,6 +56,7 @@ public class TouchService extends AccessibilityService implements OnClickListene
     public static int onDoubleClick = -1;
     public static int onLongClick = -1;
     public static int size = 49;
+    public static boolean isScan = false;
 
     private static final String TAG = "TouchService";
     private static final int INCIDENT_BACK = 0;
@@ -146,7 +150,57 @@ public class TouchService extends AccessibilityService implements OnClickListene
     }
 
     @Override
-    public void onAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
+    public void onAccessibilityEvent(AccessibilityEvent event) {
+        int eventType = event.getEventType();
+        switch (eventType) {
+            case AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED:
+//                handleNotification(event);
+                break;
+            case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
+            case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
+                if (isScan)
+                    simulateClick();
+                break;
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private void simulateClick() {
+        AccessibilityNodeInfo rootNode = getRootInActiveWindow();
+        recycle(rootNode);
+    }
+
+    /**
+     * 递归查找文字
+     *
+     * @param node
+     */
+    public AccessibilityNodeInfo recycle(AccessibilityNodeInfo node) {
+        if (node.getChildCount() == 0) {
+            if (node.getText() != null) {
+                if ("再来一次".equals(node.getText().toString())) {
+                    Log.i("Yao", "---------------再来一次");
+                    node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    return node;
+                } else if ("本次扫描没有结果".equals(node.getText().toString())) {
+                    Log.i("Yao", "---------------本次扫描没有结果");
+                    node.getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    return node;
+                } else if ("收下福卡".equals(node.getText().toString())) {
+                    Log.i("Yao", "---------------收下福卡");
+                    node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+
+                    return node;
+                }
+            }
+        } else {
+            for (int i = 0; i < node.getChildCount(); i++) {
+                if (node.getChild(i) != null) {
+                    recycle(node.getChild(i));
+                }
+            }
+        }
+        return node;
     }
 
     @Override
