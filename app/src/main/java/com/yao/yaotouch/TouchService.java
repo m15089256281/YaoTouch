@@ -8,6 +8,7 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.yao.yaotouch.ui.FloatView;
+import com.yao.yaotouch.ui.ReturnLeftView;
 import com.yao.yaotouch.ui.ReturnView;
 
 public class TouchService extends AccessibilityService {
@@ -27,6 +28,7 @@ public class TouchService extends AccessibilityService {
     OnActionListener onActionListener;
     FloatView floatView;
     ReturnView returnView;
+    ReturnLeftView returnLeftView;
 
     @Override
     protected void onServiceConnected() {
@@ -34,7 +36,8 @@ public class TouchService extends AccessibilityService {
         mTouchService = this;
         onActionListener = new OnActionListener(this);
         floatView = new FloatView().setOnActionListener(onActionListener);
-        returnView = new ReturnView().setOnActionListener(onActionListener);
+//        returnView = new ReturnView().setOnActionListener(onActionListener);
+        returnLeftView = new ReturnLeftView().setOnActionListener(onActionListener);
     }
 
     @Override
