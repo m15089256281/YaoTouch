@@ -70,7 +70,7 @@ public class ReturnLeftView implements View.OnTouchListener {
         //调整悬浮窗显示的停靠位置为左侧置顶
         wmParams.gravity = Gravity.LEFT | Gravity.TOP;
         // 以屏幕左上角为原点，设置x、y初始值
-        wmParams.x = startX = mWindowManager.getDefaultDisplay().getWidth() - DisplayUtils.dip2px(getApplication(), 16);
+        wmParams.x = startX = mWindowManager.getDefaultDisplay().getWidth() - DisplayUtils.dip2px(getApplication(), 4);
         wmParams.y = startY = mWindowManager.getDefaultDisplay().getHeight() - DisplayUtils.dip2px(getApplication(), 280);
         //设置悬浮窗口长宽数据
         wmParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
@@ -134,12 +134,12 @@ public class ReturnLeftView implements View.OnTouchListener {
         WindowManager.LayoutParams wmParams = (WindowManager.LayoutParams) mFloatLayout.getLayoutParams();
         if (wmParams == null) wmParams = new WindowManager.LayoutParams();
 //        wmParams.x = (int) (x - mTouchStartX);
-        if (x - mTouchStartX < startX - 222) {
-            wmParams.x = startX - 222;
+        if (x - mTouchStartX < startX - 111) {
+            wmParams.x = startX - 111;
         } else {
             wmParams.x = (int) (x - mTouchStartX);
         }
-        int alpha = (int) (((startX - wmParams.x) / 222f) * 179f);
+        int alpha = (int) (((startX - wmParams.x) / 111f) * 179f);
         mFloatLayout.setBackgroundColor(Color.BLACK);
         mFloatLayout.getBackground().setAlpha(alpha);
         mWindowManager.updateViewLayout(mFloatLayout, wmParams);  //刷新显示
@@ -151,7 +151,7 @@ public class ReturnLeftView implements View.OnTouchListener {
 //        wmParams.x = (int) (x - mTouchStartX);
 
         //从临界点复位
-        if (wmParams.x <= startX - 222) {
+        if (wmParams.x <= startX - 111) {
             if (onActionListener != null) {
                 onActionListener.execute(onTouchClick);
             }

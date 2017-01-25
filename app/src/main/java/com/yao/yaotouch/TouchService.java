@@ -44,6 +44,7 @@ public class TouchService extends AccessibilityService {
     public boolean onUnbind(Intent intent) {
         if (floatView != null) floatView.detachView();
         if (returnView != null) returnView.detachView();
+        if (returnLeftView != null) returnLeftView.detachView();
         return super.onUnbind(intent);
     }
 
