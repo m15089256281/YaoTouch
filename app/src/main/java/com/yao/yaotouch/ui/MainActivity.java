@@ -1,22 +1,25 @@
 package com.yao.yaotouch.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.CompoundButton;
+import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.yao.yaotouch.bean.Action;
 import com.yao.yaotouch.R;
-import com.yao.yaotouch.adapter.SettingAdapter;
-import com.yao.yaotouch.bean.SettingBean;
 import com.yao.yaotouch.TouchService;
 import com.yao.yaotouch.YaoTouchApp;
+import com.yao.yaotouch.adapter.SettingAdapter;
+import com.yao.yaotouch.bean.Action;
+import com.yao.yaotouch.bean.SettingBean;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -27,19 +30,24 @@ import static com.yao.yaotouch.utils.ConfigurationUtil.settingList;
 import static com.yao.yaotouch.utils.ConfigurationUtil.sponsorActions;
 
 
-public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener {
+public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
 
     RecyclerView recyclerView;
     Context context = this;
     SettingAdapter adapter;
     SeekBar seekBar;
     TextView sizeTv;
-    Switch isScanSw;
+    Switch isAccessibility, isFloat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         initView();
     }
 
@@ -57,14 +65,13 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         sizeTv = (TextView) findViewById(R.id.tv_size);
         sizeTv.setText(TouchService.size + "");
 
-        isScanSw = (Switch) findViewById(R.id.is_scan);
-        isScanSw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                TouchService.isScan = isChecked;
-            }
-        });
+        isAccessibility = (Switch) findViewById(R.id.is_accessibility);
+        isFloat = (Switch) findViewById(R.id.is_float);
+        isAccessibility.setOnClickListener(this);
+        isFloat.setOnClickListener(this);
 
+        isAccessibility.setChecked(TouchService.isAccessibilitySettingsOn(this));
+        isFloat.setChecked(Build.VERSION.SDK_INT >= 23 && Settings.canDrawOverlays(this) || Build.VERSION.SDK_INT < 23);
         if (settingList.size() == 0) {
             for (Action action : responseActions) {
                 SettingBean bean = new SettingBean();
@@ -122,5 +129,20 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.is_accessibility:
+                // 引导至辅助功能设置页面
+                startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+                break;
+            case R.id.is_float:
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivityForResult(intent, 1);
+                break;
+        }
     }
 }

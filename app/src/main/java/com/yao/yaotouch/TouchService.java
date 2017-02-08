@@ -1,11 +1,10 @@
 package com.yao.yaotouch;
 
 import android.accessibilityservice.AccessibilityService;
-import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.provider.Settings;
 import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.yao.yaotouch.ui.FloatView;
 import com.yao.yaotouch.ui.ReturnLeftView;
@@ -19,7 +18,6 @@ public class TouchService extends AccessibilityService {
     public static int onLongClick = -1;
     public static int onTouchClick = 0;
     public static int size = 49;
-    public static boolean isScan = false;
 
     private static final String TAG = "TouchService";
 
@@ -37,7 +35,7 @@ public class TouchService extends AccessibilityService {
         onActionListener = new OnActionListener(this);
         floatView = new FloatView().setOnActionListener(onActionListener);
 //        returnView = new ReturnView().setOnActionListener(onActionListener);
-        returnLeftView = new ReturnLeftView().setOnActionListener(onActionListener);
+//        returnLeftView = new ReturnLeftView().setOnActionListener(onActionListener);
     }
 
     @Override
@@ -50,53 +48,6 @@ public class TouchService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        int eventType = event.getEventType();
-        switch (eventType) {
-            case AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED:
-//                handleNotification(event);
-                break;
-            case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
-            case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
-                if (isScan)
-                    simulateClick();
-                break;
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void simulateClick() {
-        AccessibilityNodeInfo rootNode = getRootInActiveWindow();
-        recycle(rootNode);
-    }
-
-    /**
-     * 递归查找文字
-     *
-     * @param node
-     */
-    public AccessibilityNodeInfo recycle(AccessibilityNodeInfo node) {
-        if (node.getChildCount() == 0) {
-            if (node.getText() != null) {
-                if ("再来一次".equals(node.getText().toString())) {
-                    node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                    return node;
-                } else if ("本次扫描没有结果".equals(node.getText().toString())) {
-                    node.getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                    return node;
-                } else if ("收下福卡".equals(node.getText().toString())) {
-                    node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-
-                    return node;
-                }
-            }
-        } else {
-            for (int i = 0; i < node.getChildCount(); i++) {
-                if (node.getChild(i) != null) {
-                    recycle(node.getChild(i));
-                }
-            }
-        }
-        return node;
     }
 
     @Override
@@ -108,5 +59,25 @@ public class TouchService extends AccessibilityService {
         if (mTouchService != null && mTouchService.floatView != null) {
             mTouchService.floatView.refreshSize();
         }
+    }
+
+    public static boolean isAccessibilitySettingsOn(Context context) {
+        int accessibilityEnabled = 0;
+        try {
+            accessibilityEnabled = Settings.Secure.getInt(context.getContentResolver(),
+                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (accessibilityEnabled == 1) {
+            String services = Settings.Secure.getString(context.getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            if (services != null) {
+                return services.toLowerCase().contains(context.getPackageName().toLowerCase());
+            }
+        }
+
+        return false;
     }
 }

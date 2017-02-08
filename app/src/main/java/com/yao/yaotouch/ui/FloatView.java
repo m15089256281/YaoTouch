@@ -127,7 +127,7 @@ public class FloatView implements View.OnClickListener, View.OnLongClickListener
             case MotionEvent.ACTION_MOVE:   //捕获手指触摸移动动作
                 updateViewPosition();
                 //移动距离大于10,不响应长按事件
-                if (Math.abs(event.getX() - mTouchStartX) + Math.abs(event.getY() - mTouchStartY) > 10)
+                if (Math.abs(event.getX() - mTouchStartX) + Math.abs(event.getY() - mTouchStartY) > 5)
                     isLongClick = false;
                 return true;
             case MotionEvent.ACTION_UP:    //捕获手指触摸离开动作
