@@ -16,6 +16,10 @@ public class TouchService extends AccessibilityService {
     public static int onClick = -1;
     public static int onDoubleClick = -1;
     public static int onLongClick = -1;
+    public static int onTouchLeft = -1;
+    public static int onTouchRight = -1;
+    public static int onTouchTop = -1;
+    public static int onTouchBottom = -1;
     public static int onTouchClick = 0;
     public static int size = 49;
 

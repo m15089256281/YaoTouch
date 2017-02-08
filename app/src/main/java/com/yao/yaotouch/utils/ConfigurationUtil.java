@@ -77,6 +77,15 @@ public class ConfigurationUtil {
             TouchService.onDoubleClick = bean.getValue().getAction();
         } else if (action == 2) {
             TouchService.onLongClick = bean.getValue().getAction();
+        } else if (action == 3) {
+            TouchService.onTouchTop = bean.getValue().getAction();
+        } else if (action == 4) {
+            TouchService.onTouchLeft = bean.getValue().getAction();
+        } else if (action == 5) {
+            TouchService.onTouchRight = bean.getValue().getAction();
+        } else if (action == 6) {
+            TouchService.onTouchBottom = bean.getValue().getAction();
+
         }
     }
 

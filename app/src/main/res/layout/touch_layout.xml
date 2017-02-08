@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/button"
         android:layout_width="49dp"
         android:layout_height="49dp"
@@ -16,6 +16,6 @@
             android:layout_height="match_parent"
             android:src="@drawable/round_white"/>
 
-    </LinearLayout>
+    </FrameLayout>
 
 </LinearLayout>

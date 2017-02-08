@@ -18,6 +18,10 @@ import com.yao.yaotouch.utils.ConfigurationUtil;
 import static com.yao.yaotouch.TouchService.onClick;
 import static com.yao.yaotouch.TouchService.onDoubleClick;
 import static com.yao.yaotouch.TouchService.onLongClick;
+import static com.yao.yaotouch.TouchService.onTouchBottom;
+import static com.yao.yaotouch.TouchService.onTouchLeft;
+import static com.yao.yaotouch.TouchService.onTouchRight;
+import static com.yao.yaotouch.TouchService.onTouchTop;
 import static com.yao.yaotouch.TouchService.size;
 import static com.yao.yaotouch.YaoTouchApp.getApplication;
 
@@ -38,13 +42,17 @@ public class FloatView implements View.OnClickListener, View.OnLongClickListener
 
     //长按响应开关
     boolean isLongClick = true;
+    //移动响应开关
+    boolean isMove = false;
+    //滑动响应
+    int touchType = -1;
 
     private long startTime = 0;
-
     private long endTime = 0;
     private float mTouchStartX;
-
     private float mTouchStartY;
+    private float mTouchStartRawX;
+    private float mTouchStartRawY;
     private float x;
     private float y;
 
@@ -77,8 +85,8 @@ public class FloatView implements View.OnClickListener, View.OnLongClickListener
         //调整悬浮窗显示的停靠位置为左侧置顶
         wmParams.gravity = Gravity.LEFT | Gravity.TOP;
         // 以屏幕左上角为原点，设置x、y初始值
-        wmParams.x = 0;
-        wmParams.y = 0;
+        wmParams.x = 100;
+        wmParams.y = 100;
         //设置悬浮窗口长宽数据
         wmParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
         wmParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
@@ -120,20 +128,36 @@ public class FloatView implements View.OnClickListener, View.OnLongClickListener
                 //获取相对View的坐标，即以此View左上角为原点
                 mTouchStartX = event.getX();
                 mTouchStartY = event.getY();
+                mTouchStartRawX = event.getRawX();
+                mTouchStartRawY = event.getRawY();
 
                 startTime = System.currentTimeMillis();
                 isLongClick = true;
                 return false;
             case MotionEvent.ACTION_MOVE:   //捕获手指触摸移动动作
-                updateViewPosition();
-                //移动距离大于10,不响应长按事件
-                if (Math.abs(event.getX() - mTouchStartX) + Math.abs(event.getY() - mTouchStartY) > 5)
+                //移动距离大于5,不响应长按事件
+                if (Math.abs(x - mTouchStartRawX) + Math.abs(y - mTouchStartRawY) > 5)
                     isLongClick = false;
+                //移动距离大于300,允许更新悬浮窗位置
+                if (Math.abs(x - mTouchStartRawX) > 600 || Math.abs(y - mTouchStartRawY) > 600)
+                    isMove = true;
+                if (isMove)
+                    moveFloatView((int) (x - mTouchStartX), (int) (y - mTouchStartY));
+                else
+                    doGesture();
+
                 return true;
             case MotionEvent.ACTION_UP:    //捕获手指触摸离开动作
+                if (!isMove) {
+                    moveFloatView((int) (mTouchStartRawX - mTouchStartX), (int) (mTouchStartRawY - mTouchStartY));
+                }
+                if (touchType != -1 && onActionListener != null) {
+                    onActionListener.execute(touchType);
+                }
                 endTime = System.currentTimeMillis();
-                updateViewPosition();
                 mTouchStartX = mTouchStartY = 0;
+                isMove = false;
+                touchType = -1;
 //                isLongClick = true;
                 //当从点击到弹起小于半秒的时候,则判断为点击,如果超过则不响应点击事件
                 if ((endTime - startTime) > 100) {
@@ -146,11 +170,55 @@ public class FloatView implements View.OnClickListener, View.OnLongClickListener
     }
 
     /**
+     * 上下左右滑动判断
+     */
+    private void doGesture() {
+        int limit = mFloatLayout.getWidth() / 3;
+        float offsetX = x - mTouchStartRawX;
+        float offsetY = y - mTouchStartRawY;
+
+        if (Math.abs(offsetX) > Math.abs(offsetY)) {
+            if (Math.abs(offsetX) < limit) {
+                wmParams.x = (int) (x - mTouchStartX);
+                touchType = -1;
+            } else {
+                if (offsetX < 0) {
+                    //左移
+                    wmParams.x = (int) (mTouchStartRawX - mTouchStartX - limit);
+                    touchType = onTouchLeft;
+                } else {
+                    //右移
+                    wmParams.x = (int) (mTouchStartRawX - mTouchStartX + limit);
+                    touchType = onTouchRight;
+                }
+            }
+            wmParams.y = (int) (mTouchStartRawY - mTouchStartY);
+        } else {
+            if (Math.abs(offsetY) < limit) {
+                wmParams.y = (int) (y - mTouchStartY);
+                touchType = -1;
+            } else {
+                if (offsetY < 0) {
+                    //上移
+                    wmParams.y = (int) (mTouchStartRawY - mTouchStartY - limit);
+                    touchType = onTouchTop;
+                } else {
+                    //下移
+                    wmParams.y = (int) (mTouchStartRawY - mTouchStartY + limit);
+                    touchType = onTouchBottom;
+                }
+            }
+            wmParams.x = (int) (mTouchStartRawX - mTouchStartX);
+        }
+        mWindowManager.updateViewLayout(mFloatLayout, wmParams);  //刷新显示
+    }
+
+    /**
      * 更新浮动窗口位置
      */
-    private void updateViewPosition() {
-        wmParams.x = (int) (x - mTouchStartX);
-        wmParams.y = (int) (y - mTouchStartY);
+    private void moveFloatView(int x, int y) {
+        wmParams.x = x;
+        wmParams.y = y;
         mWindowManager.updateViewLayout(mFloatLayout, wmParams);  //刷新显示
     }
 
