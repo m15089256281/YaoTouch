@@ -1,13 +1,16 @@
 package com.yao.yaotouch.ui;
 
+import android.animation.ValueAnimator;
 import android.graphics.PixelFormat;
 import android.os.SystemClock;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.LinearLayout;
 
 import com.yao.yaotouch.OnActionListener;
@@ -15,6 +18,7 @@ import com.yao.yaotouch.R;
 import com.yao.yaotouch.YaoTouchApp;
 import com.yao.yaotouch.utils.ConfigurationUtil;
 
+import static com.yao.yaotouch.TouchService.isMargin;
 import static com.yao.yaotouch.TouchService.onClick;
 import static com.yao.yaotouch.TouchService.onDoubleClick;
 import static com.yao.yaotouch.TouchService.onLongClick;
@@ -136,23 +140,25 @@ public class FloatView implements View.OnClickListener, View.OnLongClickListener
                 return false;
             case MotionEvent.ACTION_MOVE:   //捕获手指触摸移动动作
                 //移动距离大于5,不响应长按事件
-                if (Math.abs(x - mTouchStartRawX) + Math.abs(y - mTouchStartRawY) > 5)
+                if (Math.abs(x - mTouchStartRawX) + Math.abs(y - mTouchStartRawY) > 20)
                     isLongClick = false;
                 //移动距离大于300,允许更新悬浮窗位置
-                if (Math.abs(x - mTouchStartRawX) > 600 || Math.abs(y - mTouchStartRawY) > 600)
+                if (isMargin || Math.abs(x - mTouchStartRawX) > 600 || Math.abs(y - mTouchStartRawY) > 600)
                     isMove = true;
                 if (isMove)
                     moveFloatView((int) (x - mTouchStartX), (int) (y - mTouchStartY));
-                else
-                    doGesture();
+                else if (!isMargin) doGesture();
 
                 return true;
             case MotionEvent.ACTION_UP:    //捕获手指触摸离开动作
                 if (!isMove) {
                     moveFloatView((int) (mTouchStartRawX - mTouchStartX), (int) (mTouchStartRawY - mTouchStartY));
                 }
-                if (touchType != -1 && onActionListener != null) {
+                if (!isMargin && touchType != -1 && onActionListener != null) {
                     onActionListener.execute(touchType);
+                }
+                if (isMargin) {
+                    marginLimit();
                 }
                 endTime = System.currentTimeMillis();
                 mTouchStartX = mTouchStartY = 0;
@@ -270,5 +276,34 @@ public class FloatView implements View.OnClickListener, View.OnLongClickListener
         if (mFloatLayout != null) {
             mWindowManager.removeView(mFloatLayout);
         }
+    }
+
+    /**
+     * 自动靠边
+     */
+    public void marginLimit() {
+        DisplayMetrics metric = new DisplayMetrics();
+        mWindowManager.getDefaultDisplay().getMetrics(metric);
+        final int fW = metric.widthPixels;     // 屏幕宽度（像素）
+        final int vW = mFloatLayout.getWidth();
+        final int vLocation = wmParams.x;
+
+        ValueAnimator anim = ValueAnimator.ofFloat(0f, 1f);
+        anim.setInterpolator(new AccelerateInterpolator());
+        anim.setDuration(500);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float currentValue = (float) animation.getAnimatedValue();
+                if ((vLocation + vW / 2 - fW / 2) > 0) {
+                    //靠右
+                    moveFloatView(vLocation + (int) ((fW - vLocation - vW / 2) * currentValue), wmParams.y);
+                } else {
+                    //靠左
+                    moveFloatView(vLocation - (int) ((vLocation + vW / 2) * currentValue), wmParams.y);
+                }
+            }
+        });
+        anim.start();
     }
 }

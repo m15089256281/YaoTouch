@@ -9,6 +9,7 @@ import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Switch;
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     SettingAdapter adapter;
     SeekBar seekBar;
     TextView sizeTv;
-    Switch isAccessibility, isFloat;
+    Switch isAccessibility, isFloat, isMargin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +68,14 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
         isAccessibility = (Switch) findViewById(R.id.is_accessibility);
         isFloat = (Switch) findViewById(R.id.is_float);
+        isMargin = (Switch) findViewById(R.id.is_margin);
         isAccessibility.setOnClickListener(this);
         isFloat.setOnClickListener(this);
+        isMargin.setOnClickListener(this);
 
         isAccessibility.setChecked(TouchService.isAccessibilitySettingsOn(this));
         isFloat.setChecked(Build.VERSION.SDK_INT >= 23 && Settings.canDrawOverlays(this) || Build.VERSION.SDK_INT < 23);
+        isMargin.setChecked(TouchService.isMargin);
         if (settingList.size() == 0) {
             for (Action action : responseActions) {
                 SettingBean bean = new SettingBean();
@@ -142,6 +146,11 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivityForResult(intent, 1);
+                break;
+            case R.id.is_margin:
+//                isMargin.setChecked(!isMargin.isChecked());
+                TouchService.isMargin = isMargin.isChecked();
+                Log.i("Yao", "------- " + TouchService.isMargin);
                 break;
         }
     }

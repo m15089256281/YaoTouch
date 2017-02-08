@@ -22,8 +22,10 @@ public class TouchService extends AccessibilityService {
     public static int onTouchBottom = -1;
     public static int onTouchClick = 0;
     public static int size = 49;
+    public static boolean isMargin = false;
 
     private static final String TAG = "TouchService";
+
 
     private static TouchService mTouchService;
 

@@ -65,6 +65,32 @@
         android:layout_height="wrap_content"
         android:scrollbars="none"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_white_press"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="自动靠边"
+            android:textColor="@color/font_black"
+            android:textSize="14sp"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <Switch
+            android:id="@+id/is_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
